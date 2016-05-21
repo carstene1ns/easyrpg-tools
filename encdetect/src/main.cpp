@@ -92,6 +92,7 @@ bool detect_uchardet(const char *text, unsigned int size) {
 int main(int argc, const char* argv[]) {
 	std::ostringstream text;
 	bool force = false;
+	bool extended = false;
 
 	/* parse command line arguments */
 	for (int i = 1; i < argc; ++i) {
@@ -102,8 +103,16 @@ int main(int argc, const char* argv[]) {
 			std::cout << "Usage: encdetect [ Options ] RPG_RT.ldb" << std::endl;
 			std::cout << "Options:" << std::endl;
 			std::cout << "  -h, --help             This usage message" << std::endl;
-			std::cout << "  -f, --force            " << std::endl;
+			std::cout << "  -f, --force            Force detection, even if the Database header is different (dangerous!)" << std::endl;
+			std::cout << "  -e, --extended         Use additional strings (variables, switches, chipset names) for detection" << std::endl;
+
 			return 0;
+		}
+		if ((arg == "--force") || (arg == "-f")) {
+			force = true;
+		}
+		if ((arg == "--extended") || (arg == "-e")) {
+			extended = true;
 		}
 	}
 
@@ -173,6 +182,23 @@ int main(int argc, const char* argv[]) {
 	if (text.str().size() < 34) {
 		std::cout << "Database terms are empty, no encoding detection possible!" << std::endl;
 		return 1;
+	}
+
+	if (extended) {
+		for (int i = 0; i < Data::chipsets.size(); i++) {
+			if (Data::chipsets[i].name.size() + Data::chipsets[i].chipset_name.size() > 0)
+				text <<	" " << Data::chipsets[i].name << " " << Data::chipsets[i].chipset_name;
+		}
+
+		for (int i = 0; i < Data::variables.size(); i++) {
+			if (Data::variables[i].name.size() > 0)
+				text << " " << Data::variables[i].name;
+		}
+
+		for (int i = 0; i < Data::switches.size(); i++) {
+			if (Data::switches[i].name.size() > 0)
+				text << " " << Data::switches[i].name;
+		}
 	}
 
 #ifdef HAVE_ICU
