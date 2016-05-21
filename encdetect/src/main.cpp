@@ -23,28 +23,8 @@
 #include <unicode/ustream.h>
 #include <unicode/ucsdet.h>
 #endif
-#ifdef HAVE_ENCA
-#include <enca.h>
-#endif
 #ifdef HAVE_UCHARDET
 #include <uchardet.h>
-#endif
-#ifdef HAVE_GUESS
-#include <libguess.h>
-const char *guess_regions[] {
-	GUESS_REGION_JP, // japanese
-	GUESS_REGION_TW, // taiwanese
-	GUESS_REGION_CN, // chinese
-	GUESS_REGION_KR, // korean
-	GUESS_REGION_RU, // russian
-	GUESS_REGION_AR, // arabic
-	GUESS_REGION_TR, // turkish
-	GUESS_REGION_GR, // greek
-	GUESS_REGION_HW, // hebrew
-	GUESS_REGION_PL, // polish
-	GUESS_REGION_BL, // baltic
-	0
-};
 #endif
 
 #include <reader_struct.h>
@@ -71,7 +51,9 @@ bool detect_icu(const char *text, unsigned int size) {
 			const char *lang = ucsdet_getLanguage(matches[i], &status);
 			int32_t conf = ucsdet_getConfidence(matches[i], &status);
 
-			std::cout << "ENC: " << std::string(enc) << " LANG: " << std::string(lang) << " CONF: " << std::to_string(conf) << "%" << std::endl;
+			std::cout << (conf > 20 ? " " : "(") << "ENC: " << std::string(enc) <<
+				" LANG: " << std::string(lang) << " CONF: " << std::to_string(conf) << "%" <<
+				(conf > 20 ? " " : ")") << std::endl;
 		}
 		is_ok = true;
 	}
@@ -84,17 +66,18 @@ bool detect_icu(const char *text, unsigned int size) {
 
 #ifdef HAVE_UCHARDET
 bool detect_uchardet(const char *text, unsigned int size) {
+	const char *detected = NULL;
 	bool is_ok = false;
 
 	std::cout << "uchardet\n--------" << std::endl;
 	uchardet_t det = uchardet_new();
 	if (det && (uchardet_handle_data(det, text, size) == 0)) {
 		uchardet_data_end(det);
-		const char *res = uchardet_get_charset(det);
-		if (res && !res[0])
-			res = NULL;
-		if (res) {
-			std::cout << "ENC: " << std::string(res) << std::endl;
+		detected = uchardet_get_charset(det);
+		if (detected && !detected[0])
+			detected = NULL;
+		if (detected) {
+			std::cout << "ENC: " << std::string(detected) << std::endl;
 			is_ok = true;
 		}
 	}
@@ -105,49 +88,6 @@ bool detect_uchardet(const char *text, unsigned int size) {
 }
 #endif
 
-#ifdef HAVE_ENCA
-bool detect_enca(const char *text, unsigned int size) {
-	const char *language = "__";
-	const char *detected_cp = NULL;
-	bool is_ok = false;
-
-	std::cout << "ENCA\n----" << std::endl;
-	EncaAnalyser analyser = enca_analyser_alloc(language);
-	if (analyser) {
-		enca_set_termination_strictness(analyser, 0);
-		EncaEncoding enc = enca_analyse_const(analyser, reinterpret_cast<const unsigned char*>(text), size);
-		const char *name = enca_charset_name(enc.charset, ENCA_NAME_STYLE_ICONV);
-		if (name && enc.charset != ENCA_CS_UNKNOWN) {
-			std::cout << "ENC: " << std::string(name) << std::endl;
-			is_ok = true;
-		}
-	}
-	enca_analyser_free(analyser);
-	std::cout << std::endl;
-
-	return is_ok;
-}
-#endif
-
-#ifdef HAVE_GUESS
-bool detect_guess(const char *text, unsigned int size) {
-	const char *encoding = 0;
-	bool is_ok = false;
-
-	std::cout << "libguess\n--------" << std::endl;
-	for (int i = 0; guess_regions[i]; i++) {
-		encoding = libguess_determine_encoding(text, size, guess_regions[i]);
-		if (encoding) {
-			std::cout << "LANG: " << guess_regions[i] << " GUESS: " << std::string(encoding) << std::endl;
-			is_ok = true;
-			break;
-		}
-	}
-	std::cout << std::endl;
-
-	return is_ok;
-}
-#endif
 
 int main(int argc, const char* argv[]) {
 	std::ostringstream text;
@@ -240,12 +180,6 @@ int main(int argc, const char* argv[]) {
 #endif
 #ifdef HAVE_UCHARDET
 	detect_uchardet(text.str().c_str(), text.str().size());
-#endif
-#ifdef HAVE_ENCA
-	detect_enca(text.str().c_str(), text.str().size());
-#endif
-#ifdef HAVE_GUESS
-	detect_guess(text.str().c_str(), text.str().size());
 #endif
 
 	return 0;

@@ -22,14 +22,6 @@ AS_IF([test "x$with_icu" != "xno"],[
 ],[
 	AC_MSG_NOTICE([ICU support disabled])
 ])
-AC_ARG_WITH([enca],[AS_HELP_STRING([--without-enca],
-	[Disable ENCA @<:@default=auto@:>@])])
-AS_IF([test "x$with_enca" != "xno"],[
-	PKG_CHECK_MODULES([ENCA], [enca],[AC_DEFINE(HAVE_ENCA,[1],[ENCA support])],
-		[AC_MSG_WARN([ENCA not found, support disabled])])
-],[
-	AC_MSG_NOTICE([ENCA support disabled])
-])
 AC_ARG_WITH([uchardet],[AS_HELP_STRING([--without-uchardet],
 	[Disable uchardet @<:@default=auto@:>@])])
 AS_IF([test "x$with_uchardet" != "xno"],[
@@ -37,14 +29,6 @@ AS_IF([test "x$with_uchardet" != "xno"],[
 		[AC_MSG_WARN([uchardet not found, support disabled])])
 ],[
 	AC_MSG_NOTICE([uchardet support disabled])
-])
-AC_ARG_WITH([libguess],[AS_HELP_STRING([--without-libguess],
-	[Disable libguess @<:@default=auto@:>@])])
-AS_IF([test "x$with_libguess" != "xno"],[
-	PKG_CHECK_MODULES([GUESS], [libguess],[AC_DEFINE(HAVE_GUESS,[1],[libguess support])],
-		[AC_MSG_WARN([libguess not found, support disabled])])
-],[
-	AC_MSG_NOTICE([libguess support disabled])
 ])
 
 AC_OUTPUT
