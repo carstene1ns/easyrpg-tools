@@ -143,43 +143,51 @@ int main(int argc, const char* argv[]) {
 	TypeReader<RPG::Database>::ReadLcf(Data::data, reader, 0);
 
 	text <<
-	Data::terms.menu_save << " " <<
-	Data::terms.menu_quit << " " <<
-	Data::terms.new_game << " " <<
-	Data::terms.load_game << " " <<
-	Data::terms.exit_game << " " <<
-	Data::terms.status << " " <<
-	Data::terms.row << " " <<
-	Data::terms.order << " " <<
-	Data::terms.wait_on << " " <<
-	Data::terms.wait_off << " " <<
-	Data::terms.level << " " <<
-	Data::terms.health_points << " " <<
-	Data::terms.spirit_points << " " <<
-	Data::terms.normal_status << " " <<
-	Data::terms.exp_short << " " <<
-	Data::terms.lvl_short << " " <<
-	Data::terms.hp_short << " " <<
-	Data::terms.sp_short << " " <<
-	Data::terms.sp_cost << " " <<
-	Data::terms.attack << " " <<
-	Data::terms.defense << " " <<
-	Data::terms.spirit << " " <<
-	Data::terms.agility << " " <<
-	Data::terms.weapon << " " <<
-	Data::terms.shield << " " <<
-	Data::terms.armor << " " <<
-	Data::terms.helmet << " " <<
-	Data::terms.accessory << " " <<
-	Data::terms.save_game_message << " " <<
-	Data::terms.load_game_message << " " <<
-	Data::terms.file << " " <<
-	Data::terms.exit_game_message << " " <<
-	Data::terms.yes << " " <<
-	Data::terms.no;
+	Data::terms.menu_save <<
+	Data::terms.menu_quit <<
+	Data::terms.new_game <<
+	Data::terms.load_game <<
+	Data::terms.exit_game <<
+	Data::terms.status <<
+	Data::terms.row <<
+	Data::terms.order <<
+	Data::terms.wait_on <<
+	Data::terms.wait_off <<
+	Data::terms.level <<
+	Data::terms.health_points <<
+	Data::terms.spirit_points <<
+	Data::terms.normal_status <<
+	Data::terms.exp_short <<
+	Data::terms.lvl_short <<
+	Data::terms.hp_short <<
+	Data::terms.sp_short <<
+	Data::terms.sp_cost <<
+	Data::terms.attack <<
+	Data::terms.defense <<
+	Data::terms.spirit <<
+	Data::terms.agility <<
+	Data::terms.weapon <<
+	Data::terms.shield <<
+	Data::terms.armor <<
+	Data::terms.helmet <<
+	Data::terms.accessory <<
+	Data::terms.save_game_message <<
+	Data::terms.load_game_message <<
+	Data::terms.file <<
+	Data::terms.exit_game_message <<
+	Data::terms.yes <<
+	Data::terms.no <<
+	Data::system.boat_name <<
+	Data::system.ship_name <<
+	Data::system.airship_name <<
+	Data::system.title_name <<
+	Data::system.gameover_name <<
+	Data::system.system_name <<
+	Data::system.system2_name <<
+	Data::system.battletest_background <<
+	Data::system.frame_name;
 
-	// Checks if there are more than the above 33 spaces (no data)
-	if (text.str().size() < 34) {
+	if (text.str().empty()) {
 		std::cout << "Database terms are empty, no encoding detection possible!" << std::endl;
 		return 1;
 	}
@@ -187,17 +195,17 @@ int main(int argc, const char* argv[]) {
 	if (extended) {
 		for (int i = 0; i < Data::chipsets.size(); i++) {
 			if (Data::chipsets[i].name.size() + Data::chipsets[i].chipset_name.size() > 0)
-				text <<	" " << Data::chipsets[i].name << " " << Data::chipsets[i].chipset_name;
+				text <<	Data::chipsets[i].name << Data::chipsets[i].chipset_name;
 		}
 
 		for (int i = 0; i < Data::variables.size(); i++) {
-			if (Data::variables[i].name.size() > 0)
-				text << " " << Data::variables[i].name;
+			if (!Data::variables[i].name.empty())
+				text << Data::variables[i].name;
 		}
 
 		for (int i = 0; i < Data::switches.size(); i++) {
-			if (Data::switches[i].name.size() > 0)
-				text << " " << Data::switches[i].name;
+			if (!Data::switches[i].name.empty())
+				text << Data::switches[i].name;
 		}
 	}
 
