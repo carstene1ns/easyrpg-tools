@@ -24,4 +24,8 @@ if ENABLE_GENCACHE
 SUBDIRS += gencache
 endif
 
+if ENABLE_UNRTP
+SUBDIRS += unrtp
+endif
+
 EXTRA_DIST = README.md
