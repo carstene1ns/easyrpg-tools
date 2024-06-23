@@ -24,6 +24,38 @@ func uniStringLower(input string) string {
 	return strings.ToLower(norm.NFKC.String(input))
 }
 
+var extPriorities = map[string]int{
+	// audio, order by size, smaller is better
+	".wav":  0,
+	".flac": 1,
+	".mid":  2,
+	".ogg":  3,
+	".opus": 4,
+	".mod":  5,
+	/* graphics, first order by size,
+	   but move png last, because of true color support */
+	".bmp": 0,
+	".xyz": 1,
+	".png": 2,
+	// prefer our xml over lcf
+	".lmu": 0,
+	".emu": 1,
+	".lmt": 0,
+	".emt": 1,
+	".ldb": 0,
+	".edb": 1}
+
+func priorizeExt(first, second string) bool {
+	prioFirst, ok1 := extPriorities[first]
+	prioSecond, ok2 := extPriorities[second]
+	if !(ok1 && ok2) {
+		golog.Warn("No idea how to handle priority of extension ", first,
+			" vs. ", second, ", keeping first.")
+		return false
+	}
+	return prioSecond > prioFirst
+}
+
 // dir
 
 func createCache(directory string, depth, maxDepth int) map[string]any {
@@ -72,6 +104,16 @@ func createCache(directory string, depth, maxDepth int) map[string]any {
 					fnameKey = uniStringLower(baseName)
 				}
 
+				// Check for overwritten value
+				val, present := content[fnameKey].(string)
+				if present {
+					if priorizeExt(filepath.Ext(val), ext) {
+						golog.Debug("Replacing extension from ", val, " to ", ext)
+					} else {
+						golog.Debug("Keeping extension of ", val, " (not changing to ", ext, ")")
+						continue
+					}
+				}
 				content[fnameKey] = f.Name()
 			}
 		}
