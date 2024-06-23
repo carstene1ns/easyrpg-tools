@@ -39,6 +39,7 @@ stamp-h1
 
 Makefile
 !/xyz-thumbnailer/linux/Makefile
+!/go-ncache/Makefile
 lcf2xml/lcf2xml
 lmu2png/lmu2png
 xyz2png/xyz2png
