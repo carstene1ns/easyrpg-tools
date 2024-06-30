@@ -46,7 +46,7 @@ install: main.go
 release: main.go
 	@echo "Compiling version $(VERSION) for Release:"
 	@echo "Linux:"
-	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOAMD64=v2 $(invoke-build)
+	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(invoke-build)
 	@CGO_ENABLED=0 GOOS=linux GOARCH=arm $(invoke-build)
 	@CGO_ENABLED=0 GOOS=linux GOARCH=arm64 $(invoke-build)
 	@echo "Windows:"
